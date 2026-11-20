@@ -1,0 +1,260 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Arduino Soil Moisture Sensor – Virtual Lab</title>
+<style>
+:root{--green:#176b45;--dark:#17352a;--light:#eef6f1;--line:#d6e5dc}
+*{box-sizing:border-box}
+body{margin:0;font-family:Arial,sans-serif;background:var(--light);color:#20352b}
+header{background:linear-gradient(120deg,#145b3b,#23865a);color:white;padding:24px 16px;text-align:center}
+header h1{margin:0 0 8px;font-size:clamp(22px,4vw,32px)}
+header p{margin:0;opacity:.9}
+main{max-width:1180px;margin:22px auto;padding:0 15px 30px}
+.card{background:white;border:1px solid var(--line);border-radius:15px;padding:20px;margin:16px 0;box-shadow:0 5px 18px #183b2a0b}
+h2{color:var(--green);margin:0 0 14px;font-size:21px}
+h3{margin:8px 0;color:#315744}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:16px}
+.circuit-wrap{overflow-x:auto;background:#f7faf8;border:1px solid var(--line);border-radius:12px;padding:10px}
+svg{display:block;width:100%;min-width:650px;height:auto}
+.board{fill:#168b83;stroke:#08645e;stroke-width:3}
+.boardtext{font:bold 16px Arial;fill:white}
+.pin{fill:#e9c85a;stroke:#866c19;stroke-width:1}
+.sensor{fill:#263c35;stroke:#13251f;stroke-width:3}
+.sensorpad{fill:#c7a46b;stroke:#80603b;stroke-width:2}
+.wire{fill:none;stroke-width:5;stroke-linecap:round;stroke-dasharray:10 7;animation:flow 1s linear infinite}
+.red{stroke:#e34b4b}.black{stroke:#303b3b}.yellow{stroke:#e1b52c}
+@keyframes flow{to{stroke-dashoffset:-34}}
+.range{width:100%;accent-color:#168b55}
+.big{font-size:32px;font-weight:700;color:var(--green)}
+.metric{background:#f5faf6;border-radius:10px;padding:14px}
+.metric small{display:block;color:#61766a;margin-bottom:5px}
+button{border:0;border-radius:8px;padding:10px 15px;margin:5px 5px 5px 0;background:var(--green);color:white;font-weight:600;cursor:pointer}
+button:hover{background:#104b31}
+button.secondary{background:#e5f1e9;color:#205b3d}
+.bar{height:16px;background:#e5ece7;border-radius:20px;overflow:hidden;margin:8px 0}
+.bar span{display:block;height:100%;width:50%;background:#2eaa6a;transition:width .25s}
+.status{font-weight:700;font-size:19px}
+.lamp{width:28px;height:28px;border-radius:50%;display:inline-block;vertical-align:middle;background:#b9c4bd;border:3px solid #89988f;box-shadow:inset 0 0 5px #5555}
+.lamp.on{background:#ff4c43;box-shadow:0 0 16px #ff4c43}
+.pump{font-size:42px;display:inline-block;opacity:.45}
+.pump.running{opacity:1;animation:pulse .65s infinite alternate}
+@keyframes pulse{to{transform:scale(1.12)}}
+.soilbox{height:95px;border-radius:10px;background:linear-gradient(#a77b4d,#684326);display:flex;align-items:center;justify-content:center;color:white;font-weight:bold;position:relative;overflow:hidden}
+.drop{position:absolute;color:#8ed9ff;font-size:18px;animation:fall 1.5s linear infinite}
+@keyframes fall{from{transform:translateY(-35px);opacity:0}40%{opacity:1}to{transform:translateY(100px);opacity:0}}
+.monitor{background:#101b17;color:#62f59a;padding:15px;border-radius:9px;font:14px/1.8 Consolas,monospace;min-height:125px}
+table{width:100%;border-collapse:collapse}
+th,td{padding:10px;border-bottom:1px solid #e3ece6;text-align:left}
+th{background:#eaf4ed}
+.note{font-size:13px;color:#62756a;line-height:1.5}
+.tag{display:inline-block;background:#e6f3e9;color:#236342;border-radius:20px;padding:5px 10px;font-size:12px;font-weight:bold}
+footer{text-align:center;color:#6b7d73;padding:15px}
+@media(max-width:600px){.card{padding:15px}th,td{font-size:13px;padding:8px}}
+</style>
+</head>
+<body>
+<header>
+  <h1>Arduino Soil Moisture Sensor</h1>
+  <p>Interactive Virtual Experiment · Circuit connection · Live sensor simulation</p>
+</header>
+<main>
+<section class="card">
+  <h2>1. Aim</h2>
+  <p>To study how soil moisture affects the analog output of a soil moisture sensor and simulate an Arduino-controlled LED and water pump.</p>
+  <span class="tag">Virtual hardware simulation</span>
+  <span class="tag">No physical Arduino required</span>
+</section>
+
+<section class="card">
+  <h2>2. Virtual circuit and pin connections</h2>
+  <p>Connect the sensor to Arduino analog input A0. The virtual pump relay is controlled by digital pin D8. The LED is controlled by pin D13.</p>
+  <div class="circuit-wrap">
+  <svg viewBox="0 0 1000 480" role="img" aria-label="Arduino Uno connected to soil moisture sensor and relay-controlled pump">
+    <!-- Arduino -->
+    <rect x="45" y="80" width="430" height="315" rx="22" class="board"/>
+    <text x="260" y="125" text-anchor="middle" class="boardtext" style="font-size:25px">ARDUINO UNO</text>
+    <text x="260" y="153" text-anchor="middle" class="boardtext">ATmega328P</text>
+    <rect x="190" y="190" width="135" height="105" rx="8" fill="#183b39" stroke="#8ac9bd" stroke-width="3"/>
+    <text x="257" y="235" text-anchor="middle" fill="white" font-size="15">MICRO</text>
+    <text x="257" y="255" text-anchor="middle" fill="white" font-size="15">CONTROLLER</text>
+    <rect x="62" y="175" width="60" height="110" rx="5" fill="#d8dedb" stroke="#52645d" stroke-width="2"/>
+    <text x="92" y="230" text-anchor="middle" fill="#253b32" font-size="12" transform="rotate(-90 92 230)">USB</text>
+    <text x="65" y="365" fill="white" font-size="12">POWER</text>
+    <!-- Arduino pins -->
+    <g>
+      <rect x="430" y="175" width="30" height="22" class="pin"/><text x="415" y="191" text-anchor="end" fill="white" font-size="13">5V</text>
+      <rect x="430" y="220" width="30" height="22" class="pin"/><text x="415" y="236" text-anchor="end" fill="white" font-size="13">GND</text>
+      <rect x="430" y="265" width="30" height="22" class="pin"/><text x="415" y="281" text-anchor="end" fill="white" font-size="13">A0</text>
+      <rect x="430" y="310" width="30" height="22" class="pin"/><text x="415" y="326" text-anchor="end" fill="white" font-size="13">D8</text>
+      <rect x="430" y="350" width="30" height="22" class="pin"/><text x="415" y="366" text-anchor="end" fill="white" font-size="13">D13</text>
+    </g>
+    <!-- Sensor -->
+    <rect x="700" y="65" width="235" height="180" rx="14" class="sensor"/>
+    <text x="817" y="95" text-anchor="middle" fill="white" font-size="18" font-weight="bold">SOIL MOISTURE</text>
+    <text x="817" y="117" text-anchor="middle" fill="white" font-size="15">SENSOR MODULE</text>
+    <rect x="770" y="140" width="95" height="52" rx="5" fill="#536b5f"/>
+    <circle cx="793" cy="166" r="8" fill="#e3c76c"/><circle cx="842" cy="166" r="8" fill="#e3c76c"/>
+    <rect x="792" y="245" width="12" height="110" rx="3" class="sensorpad"/>
+    <rect x="830" y="245" width="12" height="110" rx="3" class="sensorpad"/>
+    <text x="817" y="385" text-anchor="middle" fill="#304b3c" font-size="14">Probe in soil</text>
+    <!-- Sensor pins -->
+    <circle cx="700" cy="155" r="6" fill="#e9c85a"/><text x="685" y="160" text-anchor="end" fill="#304b3c" font-size="13">VCC</text>
+    <circle cx="700" cy="185" r="6" fill="#e9c85a"/><text x="685" y="190" text-anchor="end" fill="#304b3c" font-size="13">GND</text>
+    <circle cx="700" cy="215" r="6" fill="#e9c85a"/><text x="685" y="220" text-anchor="end" fill="#304b3c" font-size="13">AO</text>
+    <!-- animated wires -->
+    <path d="M460 186 H570 V155 H700" class="wire red"/>
+    <path d="M460 231 H605 V185 H700" class="wire black"/>
+    <path d="M460 276 H640 V215 H700" class="wire yellow"/>
+    <!-- Relay and pump -->
+    <rect x="700" y="405" width="120" height="55" rx="8" fill="#285d9b" stroke="#173c69" stroke-width="2"/>
+    <text x="760" y="428" fill="white" text-anchor="middle" font-size="14">RELAY</text>
+    <text x="760" y="446" fill="white" text-anchor="middle" font-size="11">IN: D8</text>
+    <path d="M460 321 H570 V432 H700" class="wire red"/>
+    <path d="M820 432 H890" stroke="#397bb7" stroke-width="5" fill="none"/>
+    <circle cx="920" cy="432" r="24" fill="#d9efff" stroke="#397bb7" stroke-width="4"/>
+    <path d="M910 432 Q920 415 930 432 Q920 449 910 432" fill="#397bb7"/>
+    <text x="920" y="475" text-anchor="middle" fill="#304b3c" font-size="13">PUMP</text>
+    <text x="565" y="42" text-anchor="middle" fill="#176b45" font-size="13">Animated signal / power connections</text>
+  </svg>
+  </div>
+  <p class="note">Wire colours in this teaching diagram: red = 5V / control, black = GND, yellow = analog signal. The pump is represented as a relay-controlled load. A real pump requires a suitable external supply and driver/relay circuit; never power it directly from an Arduino pin.</p>
+</section>
+
+<section class="card">
+  <h2>3. Perform the experiment</h2>
+  <div class="grid">
+    <div>
+      <h3>Soil sample</h3>
+      <div class="soilbox" id="soilView">MODERATE SOIL</div>
+      <p><label for="moisture">Adjust soil moisture: <b id="pctLabel">50%</b></label></p>
+      <input class="range" id="moisture" type="range" min="0" max="100" value="50">
+      <div>
+        <button class="secondary" onclick="setMoisture(0)">Dry soil</button>
+        <button class="secondary" onclick="setMoisture(50)">Moderate</button>
+        <button class="secondary" onclick="setMoisture(100)">Wet soil</button>
+      </div>
+      <p class="note">Move the slider or select a preset. The sensor reading and output devices update automatically.</p>
+    </div>
+    <div>
+      <h3>Live sensor readings</h3>
+      <div class="metric"><small>Analog input at A0</small><div class="big" id="analog">600</div><small>ADC range: 0–1023</small></div>
+      <div class="metric" style="margin-top:10px"><small>Estimated moisture</small><div class="big" id="percent">50%</div><div class="bar"><span id="barFill"></span></div></div>
+      <p class="status" id="soilStatus">Moderate soil</p>
+    </div>
+  </div>
+</section>
+
+<section class="card">
+  <h2>4. Output indicators</h2>
+  <div class="grid">
+    <div class="metric">
+      <h3>LED indicator (D13)</h3>
+      <span class="lamp" id="led"></span>
+      <b id="ledText"> OFF</b>
+      <p class="note">LED turns ON when moisture is below the set threshold (30%).</p>
+    </div>
+    <div class="metric">
+      <h3>Water pump (relay D8)</h3>
+      <span class="pump" id="pump">💧</span>
+      <b id="pumpText"> Pump OFF</b>
+      <p id="pumpNote" class="note">Soil moisture is sufficient. Pump is OFF.</p>
+    </div>
+  </div>
+</section>
+
+<section class="card">
+  <h2>5. Arduino Serial Monitor</h2>
+  <div class="monitor" id="serial">Initializing virtual sensor...<br>Waiting for readings...</div>
+</section>
+
+<section class="card">
+  <h2>6. Arduino program (for physical hardware)</h2>
+  <pre style="white-space:pre-wrap;overflow:auto;background:#f3f7f4;padding:15px;border-radius:9px;font-size:13px">const int sensorPin = A0;
+const int ledPin = 13;
+const int relayPin = 8;
+
+void setup() {
+  Serial.begin(9600);
+  pinMode(ledPin, OUTPUT);
+  pinMode(relayPin, OUTPUT);
+}
+
+void loop() {
+  int sensorValue = analogRead(sensorPin);
+
+  // Calibrate these values for your own sensor.
+  int moisturePercent =
+      map(sensorValue, 900, 300, 0, 100);
+  moisturePercent =
+      constrain(moisturePercent, 0, 100);
+
+  Serial.print("Analog value: ");
+  Serial.println(sensorValue);
+  Serial.print("Moisture: ");
+  Serial.print(moisturePercent);
+  Serial.println("%");
+
+  if (moisturePercent < 30) {
+    digitalWrite(ledPin, HIGH);
+    digitalWrite(relayPin, HIGH); // Adapt to relay module logic
+  } else {
+    digitalWrite(ledPin, LOW);
+    digitalWrite(relayPin, LOW);
+  }
+
+  delay(1000);
+}</pre>
+  <p class="note">The code above assumes an active-HIGH relay. Some relay modules are active-LOW; check the module specifications and change the logic if required.</p>
+</section>
+
+<section class="card">
+  <h2>7. Observation table</h2>
+  <table>
+    <thead><tr><th>Soil condition</th><th>Simulated moisture</th><th>Analog value</th><th>LED</th><th>Pump</th></tr></thead>
+    <tbody>
+      <tr><td>Dry</td><td>0%</td><td>900</td><td>ON</td><td>ON</td></tr>
+      <tr><td>Moderate</td><td>50%</td><td>600</td><td>OFF</td><td>OFF</td></tr>
+      <tr><td>Wet</td><td>100%</td><td>300</td><td>OFF</td><td>OFF</td></tr>
+    </tbody>
+  </table>
+  <h3 style="margin-top:20px">Result</h3>
+  <p>The virtual experiment shows that the simulated analog sensor reading decreases as soil moisture increases. When the estimated moisture falls below 30%, the Arduino logic switches ON the LED and pump relay; otherwise, both remain OFF.</p>
+</section>
+<footer>Arduino Soil Moisture Sensor · Interactive Virtual Laboratory</footer>
+</main>
+<script>
+const slider=document.getElementById('moisture');
+function setMoisture(v){slider.value=v;update();}
+function update(){
+  const m=Number(slider.value);
+  // Illustrative calibration: dry=900, wet=300.
+  const raw=Math.round(900-6*m);
+  const dry=m<30;
+  const moderate=m>=30 && m<=60;
+  const condition=dry?'DRY SOIL':moderate?'MODERATE SOIL':'WET SOIL';
+  document.getElementById('pctLabel').textContent=m+'%';
+  document.getElementById('percent').textContent=m+'%';
+  document.getElementById('analog').textContent=raw;
+  document.getElementById('barFill').style.width=m+'%';
+  document.getElementById('soilView').textContent=condition;
+  document.getElementById('soilStatus').textContent=condition;
+  document.getElementById('led').classList.toggle('on',dry);
+  document.getElementById('ledText').textContent=dry?' ON':' OFF';
+  document.getElementById('pump').classList.toggle('running',dry);
+  document.getElementById('pumpText').textContent=dry?' Pump ON':' Pump OFF';
+  document.getElementById('pumpNote').textContent=dry?'Dry soil detected. Relay activated; watering is required.':'Soil moisture is sufficient. Pump is OFF.';
+  document.getElementById('serial').innerHTML=
+    'Analog value (A0): '+raw+'<br>'+
+    'Estimated moisture: '+m+'%<br>'+
+    'Soil condition: '+condition+'<br>'+
+    'LED (D13): '+(dry?'ON':'OFF')+'<br>'+
+    'Relay / pump (D8): '+(dry?'ON':'OFF')+'<br>'+
+    'Status: Simulation updated';
+}
+slider.addEventListener('input',update);
+update();
+</script>
+</body>
+</html>
